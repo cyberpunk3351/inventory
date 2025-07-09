@@ -11,7 +11,7 @@ services:
         working_dir: /var/www
         volumes:
             - ./:/var/www
-            - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+            - ./.docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
             - /etc/localtime:/etc/localtime:ro
         networks:
             - inventory-network
@@ -23,7 +23,7 @@ services:
             - "5435:80"
         volumes:
             - ./:/var/www
-            - ./nginx/conf.d/:/etc/nginx/conf.d/
+            - ./.docker/nginx/conf.d/:/etc/nginx/conf.d/
             - /etc/localtime:/etc/localtime:ro
         networks:
             - inventory-network
@@ -44,6 +44,13 @@ services:
             - /etc/localtime:/etc/localtime:ro
         networks:
             - inventory-network
+
+    meilisearch:
+        image: getmeili/meilisearch:latest
+        ports:
+            - 7700:7700
+        environment:
+            MEILI_MASTER_KEY: masterKey
 
 networks:
     inventory-network:

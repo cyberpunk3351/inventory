@@ -12,7 +12,7 @@ RUN set -eux; \
     libpng-dev libxrender1 libfontconfig1 fontconfig libfontconfig1-dev && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-configure intl && \
-    docker-php-ext-install -j$(nproc) gd pdo_mysql pdo_pgsql pgsql zip exif pcntl bcmath mbstring opcache sockets && \
+    docker-php-ext-install -j$(nproc) gd intl pdo_mysql pdo_pgsql pgsql zip exif pcntl bcmath mbstring opcache sockets && \
     docker-php-source delete && \
     rm -rf /var/lib/apt/lists/*
 
@@ -32,13 +32,13 @@ ENV LANG=ru_RU.UTF-8 \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Copy application files
-COPY --chown=www:www . /var/www
+COPY --chown=www-data:www-data . .
 
-# Set permissions for Laravel.
+# Set permissions for Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 # Switch to Laravel user
- USER www-data
+USER www-data
 
 # Expose port and start PHP-FPM
 EXPOSE 9000
