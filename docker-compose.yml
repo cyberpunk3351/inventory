@@ -1,0 +1,54 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: php:8.4-rc-fpm
+        container_name: inventory_app
+        environment:
+            SERVICE_NAME: app
+            SERVICE_TAGS: dev
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+            - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+            - /etc/localtime:/etc/localtime:ro
+        networks:
+            - inventory-network
+
+    webserver:
+        image: nginx:alpine
+        container_name: inventory_web
+        ports:
+            - "5435:80"
+        volumes:
+            - ./:/var/www
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+            - /etc/localtime:/etc/localtime:ro
+        networks:
+            - inventory-network
+
+    db:
+        image: mariadb:latest
+        container_name: inventory_db
+        ports:
+            - "6496:3306"
+        environment:
+            MYSQL_DATABASE: laravel
+            MYSQL_ROOT_PASSWORD: root
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - dbdata:/var/lib/mysql/
+            - ./.docker/mysql/my.cnf:/etc/mysql/my.cnf
+            - /etc/localtime:/etc/localtime:ro
+        networks:
+            - inventory-network
+
+networks:
+    inventory-network:
+        driver: bridge
+
+volumes:
+    dbdata:
+        driver: local
