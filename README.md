@@ -36,7 +36,7 @@ A Laravel 12 application for managing devices with health lifecycle tracking, bu
 
 3. **Environment configuration**
    ```bash
-   cp .env.example .env
+   cp .env.local .env
    ```
 
 4. **Configure environment variables**
