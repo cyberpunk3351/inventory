@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DeviceResource\Pages;
@@ -57,6 +59,12 @@ class DeviceResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(function (): Builder {
+                $search = request()->input('tableSearch');
+                return $search
+                    ? Device::search($search)->query()
+                    : Device::query();
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Device Name')
@@ -69,7 +77,7 @@ class DeviceResource extends Resource
                     ->sortable()
                     ->placeholder('Not deployed'),
 
-                Tables\Columns\BadgeColumn::make('device_health')
+                BadgeColumn::make('device_health')
                     ->label('Device Health')
                     ->getStateUsing(fn (Device $record): string => $record->device_health)
                     ->colors([
@@ -79,7 +87,6 @@ class DeviceResource extends Resource
                         'danger' => 'Poor',
                         'secondary' => 'N/A',
                     ])
-                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('device_health')
@@ -95,10 +102,10 @@ class DeviceResource extends Resource
                             return $query;
                         }
 
-                        // Get all devices and filter by health
-                        $deviceIds = Device::all()->filter(function ($device) use ($data) {
-                            return $device->device_health === $data['value'];
-                        })->pluck('id');
+                        $deviceIds = Device::search('*')
+                            ->where('device_health', $data['value'])
+                            ->get()
+                            ->pluck('id');
 
                         return $query->whereIn('id', $deviceIds);
                     }),
@@ -116,9 +123,7 @@ class DeviceResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
