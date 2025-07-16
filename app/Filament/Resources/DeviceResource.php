@@ -102,10 +102,11 @@ class DeviceResource extends Resource
                             return $query;
                         }
 
-                        $deviceIds = Device::search('*')
-                            ->where('device_health', $data['value'])
-                            ->get()
-                            ->pluck('id');
+                        $filter = addslashes($data['value']);
+                        $deviceIds = Device::search('', function ($meilisearch, $query, $options) use ($filter) {
+                            $options['filter'] = $filter;
+                            return $meilisearch->search($query, $options);
+                        })->get()->pluck('id');
 
                         return $query->whereIn('id', $deviceIds);
                     }),
