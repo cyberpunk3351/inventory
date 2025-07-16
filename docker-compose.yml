@@ -51,6 +51,8 @@ services:
             - 7700:7700
         environment:
             MEILI_MASTER_KEY: masterKey
+        networks:
+            - inventory-network
 
 networks:
     inventory-network:
