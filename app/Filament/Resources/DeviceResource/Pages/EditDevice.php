@@ -16,4 +16,14 @@ class EditDevice extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        $this->record->searchable();
+    }
+
+    protected function afterDelete(): void
+    {
+        $this->record->unsearchable();
+    }
 }
